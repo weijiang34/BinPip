@@ -27,12 +27,13 @@ The Binning Pipeline is a versatile tool that streamlines the process of handlin
 
 ## Installation
 
+- **Before installing dependencies, please ensure that the environment names match exactly those mentioned in the document.**
+
 1. **Download pipeline script:**  
-  To use the Binning Pipeline, ensure you have Python installed on your system. Then, download the pipeline script and make it executable:
-  ```
-  conda create -n bacbin pandas
-  chmod +x binning_pipeline.py
-  ```
+  To use the Binning Pipeline, ensure you have Python installed on your system. Then, clone this repository to your local system:
+    ```
+    git clone https://github.com/weijiang34/BinPip.git
+    ```
 2. **Install dependencies:**  
   The pipeline requires a series of dependent tools/softwares/scripts. Please follow the instructions below to install these dependencies.  
   - Miniconda/Conda  
@@ -85,7 +86,7 @@ This module groups samples by age and creates necessary directories.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project grouping -m manifest.csv -a age_gender.csv -n 4
+python /path/to/binning_pipeline.py -p /path/to/project grouping -m manifest.csv -a age_gender.csv -n 4
 ```
 
 - `-p`: Project directory. (Default: ./)
@@ -100,7 +101,7 @@ This module handles the concatenation of sequences, indexing, and mapping reads 
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project mapping
+python /path/to/binning_pipeline.py -p /path/to/project mapping
 ```
 
 ### Binning
@@ -110,7 +111,7 @@ This module generates sequence files, performs self-training, and binning.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project binning
+python /path/to/binning_pipeline.py -p /path/to/project binning
 ```
 
 ### CheckM
@@ -120,7 +121,7 @@ This module provides quality reports for each sample.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project checkm
+python /path/to/binning_pipeline.py -p /path/to/project checkm
 ```
 
 ### Check
@@ -130,7 +131,7 @@ This module checks the completeness of each step in the pipeline.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project check -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project check -nc 0.3 -sa 0.98
 ```
 
 - `-nc`: Nucleotide coverage for dereplication (default: 0.3).
@@ -143,7 +144,7 @@ This module selects genomes and performs dereplication.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project filter -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project filter -nc 0.3 -sa 0.98
 ```
 
 ### Classify
@@ -153,7 +154,7 @@ This module classifies MAGs using GTDB-TK.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project classify -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project classify -nc 0.3 -sa 0.98
 ```
 
 ### Quantify
@@ -163,7 +164,7 @@ This module quantifies MAGs using Salmon.
 **Usage:**
 
 ```bash
-python binning_pipeline.py -p /path/to/project quant -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project quant -nc 0.3 -sa 0.98
 ```
 
 ## Examples
@@ -172,28 +173,28 @@ Here are some example commands to get you started:
 
 ```bash
 # Grouping samples
-python binning_pipeline.py -p /path/to/project grouping -m manifest.csv -a age_gender.csv -n 4
+python /path/to/binning_pipeline.py -p /path/to/project grouping -m manifest.csv -a age_gender.csv -n 4
 
 # Mapping
-python binning_pipeline.py -p /path/to/project mapping
+python /path/to/binning_pipeline.py -p /path/to/project mapping
 
 # Binning
-python binning_pipeline.py -p /path/to/project binning
+python /path/to/binning_pipeline.py -p /path/to/project binning
 
 # CheckM
-python binning_pipeline.py -p /path/to/project checkm
+python /path/to/binning_pipeline.py -p /path/to/project checkm
 
 # Check completeness
-python binning_pipeline.py -p /path/to/project check -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project check -nc 0.3 -sa 0.98
 
 # Filter
-python binning_pipeline.py -p /path/to/project filter -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project filter -nc 0.3 -sa 0.98
 
 # Classify
-python binning_pipeline.py -p /path/to/project classify -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project classify -nc 0.3 -sa 0.98
 
 # Quantify
-python binning_pipeline.py -p /path/to/project quant -nc 0.3 -sa 0.98
+python /path/to/binning_pipeline.py -p /path/to/project quant -nc 0.3 -sa 0.98
 ```
 Every time you generated some job files, please **double check and manually submit** them. 
 
