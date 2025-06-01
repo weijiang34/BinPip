@@ -20,32 +20,6 @@ MAIL_ADDRESS = '379004663@qq.com'
 GADI_PROJECT = 'mp96'
 GADI_STORAGE = 'gdata/oo46+gdata/mp96'
 
-# Workflow
-# 1. grouping
-# 2. mapping:
-#       s1: concat & indexing
-#       s2: mapping
-# 3. binning:
-#       s3: generating sequence files
-#       s4: self-training
-#       s5: binning
-# 4. 
-
-# Check
-# 1. grouping
-#       # of groups detected (not compulsory)
-# 2. maping:
-#       s1: concat & indexing
-#           check:  concat: $group_dir/semibin_output/combined_output/concatenated.fa
-#                   indexing:  $group_dir/semibin_output/combined_output/concatenated.fa.*.bt2l
-#       s2: mapping
-#           check: $group_dir/bamsam_output/$fileHeader.bam $fileHeader.mapped.bam $fileHeader.mapped.sorted.bam $fileHeader.sam
-# 3. binning:
-#       s3: generating sequence files
-#           check: 
-#       s4: self-training
-#           check: model.h5
-
 class BashHeader():
     def __init__(self, job_name, ncpus) -> None:
         self.job_name = job_name
@@ -135,26 +109,32 @@ def group_by_age(prj_dir, manifest, age_gender, ngroups):
     group_dir = os.path.join(prj_dir, "grouped")
     
     manifest = pd.read_csv(manifest, header=0, names=["fileHeader","fq1","fq2","fa"])
-    age_gender = pd.read_csv(age_gender, header=0, names=["sample_id","age","sexbirth"])
-
-    manifest["sample_id"] = manifest["fileHeader"].str.split('_').apply(lambda x: [sep for sep in x if "HOAM" in sep][0])
-    age_gender_dict = {row["sample_id"]:[row["age"],row["sexbirth"]] for _, row in age_gender.iterrows()}
     df = manifest.copy()
-    df["age"] = manifest.apply(lambda x: age_gender_dict[x["sample_id"]][0] if x["sample_id"] in age_gender_dict.keys() else None, axis=1)
-    df["sexbirth"] = manifest.apply(lambda x: age_gender_dict[x["sample_id"]][1] if x["sample_id"] in age_gender_dict.keys() else None, axis=1)
-    df_na = df[df['age'].isna()]
-    df_na['group'] = "unknown"
-    df_non_na = df[~(df['age'].isna())]#.astype({"age":int})
-    df_non_na['group'] = pd.qcut(df_non_na['age'], ngroups).tolist()
-    # df_non_na['group'] = df_non_na['group'].fillna("unknown")
-    df_non_na['group'] = df_non_na['group'].apply(lambda x: str(x).translate(str.maketrans({"(":"", "]":"", ",":"_", " ":""})))
-    df = pd.concat([df_non_na, df_na], axis=0)
-    df = df[['sample_id','fileHeader','fq1','fq2','fa','age','sexbirth','group']]
+    
+    if os.path.isfile(age_gender):
+        # manifest["fileHeader"] = manifest["fileHeader"].str.split('_').apply(lambda x: [sep for sep in x if "HOAM" in sep][0])
+        # group by age
+        age_gender = pd.read_csv(age_gender, header=0).iloc[:,[0,1]]
+        age_gender.columns = ["fileHeader","age"]
+        age_gender_dict = {row["fileHeader"]:[row["age"]] for _, row in age_gender.iterrows()}
+        df["age"] = manifest.apply(lambda x: age_gender_dict[x["fileHeader"]][0] if x["fileHeader"] in age_gender_dict.keys() else None, axis=1)
+        df_na = df[df['age'].isna()]
+        df_na['group'] = "unknown"
+        df_non_na = df[~(df['age'].isna())]#.astype({"age":int})
+        df_non_na['group'] = pd.qcut(df_non_na['age'], ngroups).tolist()
+        df_non_na['group'] = df_non_na['group'].apply(lambda x: str(x).translate(str.maketrans({"(":"", "]":"", ",":"_", " ":""})))
+        df = pd.concat([df_non_na, df_na], axis=0)
+        df = df[['fileHeader','fileHeader','fq1','fq2','fa','age','group']]
+    else: 
+        # group by order
+        df['group'] = pd.qcut(df.index.tolist(), ngroups).tolist()
+        df['group'] = df['group'].apply(lambda x: str(x).translate(str.maketrans({"(":"", "]":"", ",":"_", " ":""})))
+        df = df[['fileHeader','fileHeader','fq1','fq2','fa','group']]
+    
     df.to_csv(os.path.join(prj_dir,"sample_summary.csv"), index=None)
     for group in df['group'].unique():
         os.makedirs(os.path.join(group_dir,group), exist_ok=True)
-    #     group_manifest = df[df['group']==group].loc[:,["sample_id","fa"]]
-    #     group_manifest.to_csv(os.path.join(prj_dir, f"{group}.csv"))
+
     print(df["group"].unique())
     return 
 
@@ -163,7 +143,6 @@ def mapping(prj_dir):
     group_dir = os.path.join(prj_dir, "grouped")
     
     sample_summary = pd.read_csv(os.path.join(prj_dir,"sample_summary.csv"), header=0)
-    # manifest = pd.read_csv(manifest_path, header=None, names=["fileHeader","sample_id","fa"])
     groups = sample_summary["group"].unique().tolist()
     for group in groups:
         group_df = sample_summary[sample_summary['group']==group]
@@ -974,9 +953,9 @@ def main():
         required=True
     )
 
-    subparser_grouping = subparsers.add_parser("grouping", help="grouping by age")
+    subparser_grouping = subparsers.add_parser("grouping", help="grouping by age or order")
     subparser_grouping.add_argument("-m","--manifest", required=True, help="a 4-column csv file: fileHeader,fq1,fq2,fa")
-    subparser_grouping.add_argument("-a","--age_gender", required=True, help="a three-column csv file: sample_id,age,sexbirth")
+    subparser_grouping.add_argument("-a","--age_gender", default='', required=False, help="a three-column csv file: fileHeader,age,sexbirth")
     subparser_grouping.add_argument("-n","--ngroups", type=int, help="default: 4, groups to split")
 
     subparser_mapping = subparsers.add_parser("mapping", help="concatenating and building index, and mapping reads to contigs")

@@ -56,7 +56,7 @@ The Binning Pipeline is a versatile tool that streamlines the process of handlin
   - dRep  
     https://github.com/MrOlm/drep
     ```
-    mamba create -n drep dRep
+    mamba create -n drep -c bioconda drep
     ```
   - GTDB-TK  
     https://ecogenomics.github.io/GTDBTk/installing/bioconda.html
@@ -71,7 +71,7 @@ The Binning Pipeline is a versatile tool that streamlines the process of handlin
   - Salmon and python2.7   
     https://salmon.readthedocs.io/en/latest/index.html
     ```
-    conda create -n salmon salmon python=2.7 numpy
+    conda create -n salmon -c conda-forge -c bioconda salmon python=2.7 numpy
     ```
 3. **Configure environment variables**  
   Modify the following part according to your paths.
@@ -86,13 +86,17 @@ This module groups samples by age and creates necessary directories.
 **Usage:**
 
 ```bash
+# if you have age information, then the grouping will be based on ages of samples:
 python /path/to/binning_pipeline.py -p /path/to/project grouping -m manifest.csv -a age_gender.csv -n 4
+# if you don't have age information, then the grouping will be based on the order of samples:
+python /path/to/binning_pipeline.py -p /path/to/project grouping -m manifest.csv -n 4
 ```
 
 - `-p`: Project directory. (Default: ./)
-- `-m`: Manifest file (CSV) with columns: fileHeader, fq1, fq2, fa.
-- `-a`: Age and gender information file (CSV) with columns: sample_id, age, sexbirth.
-- `-n`: Number of groups to split the data into (default: 4).
+- `-m`: Necessary. Manifest file (CSV) with columns: fileHeader, fq1, fq2, fa.
+- `-a`: Default: '', optional. Age and gender information file (CSV) with columns: fileHeader, age, sexbirth.  
+  *(If not provided, the grouping will be based on the order of samples.)*
+- `-n`: Default: 4. Number of groups to split the data into.
 
 ### Mapping
 
@@ -206,4 +210,5 @@ If you encounter any issues, ensure that all dependencies are installed and that
 
 For any questions or support, please contact:
 
-- Email: [wjiang34-c@my.cityu.edu.hk]
+- Email: wjiang34-c@my.cityu.edu.hk
+
