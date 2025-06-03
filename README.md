@@ -1,6 +1,6 @@
 # Binning Pipeline User Guide
 
-This document provides a comprehensive guide on how to use the Binning Pipeline, a command-line software designed for various bioinformatics tasks including grouping, mapping, binning, and more. The pipeline is built to handle large datasets and provide detailed reports on the progress and outcomes of each step. The prototype of this pipeline was first introduced in: https://mrcbioinfo.github.io/mima-pipeline/, and was later refined and automated using Python scripts, as demonstrated here.
+This document provides a comprehensive guide on how to use the Binning Pipeline, a command-line software designed for various bioinformatics tasks including grouping, mapping, binning, and more. The pipeline is built to handle large datasets and provide detailed reports on the progress and outcomes of each step. We would like to thank Tereza for her key contributions in setting up and testing the pipeline, which was later refined and automated using Python scripts, as demonstrated here.
 
 ## Table of Contents
 
